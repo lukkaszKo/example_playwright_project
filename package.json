@@ -1,0 +1,40 @@
+{
+  "name": "example_playwright_project",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/lukkaszKo/example_playwright_project#readme",
+  "bugs": {
+    "url": "https://github.com/lukkaszKo/example_playwright_project/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lukkaszKo/example_playwright_project.git"
+  },
+  "license": "ISC",
+  "author": "Łukasz Kowalik",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run lint && npm run format:check",
+    "fix": "npm run format && npm run lint:fix",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.64.0",
+    "@types/node": "^26.6.4",
+    "eslint": "^10.12.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-playwright": "^2.12.1",
+    "globals": "^17.13.0",
+    "husky": "^9.1.7",
+    "prettier": "^3.9.9",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.1"
+  }
+}
