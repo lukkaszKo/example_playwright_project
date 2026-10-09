@@ -1,6 +1,7 @@
 import { test } from '../src/fixtures/fixtures';
 import { expect } from '@playwright/test';
 
+//AAA
 test('Buttons aaa-pattern', { tag: ['@e2e', '@aaa-pattern', '@buttons'] }, async ({ buttonsPage }) => {
   //arrange
   const messages = {
@@ -24,6 +25,7 @@ test('Buttons aaa-pattern', { tag: ['@e2e', '@aaa-pattern', '@buttons'] }, async
   });
 });
 
+//DDT
 const buttons: {
   buttonName: string;
   action: 'clickMeButton' | 'doubleClickMeButton' | 'rightClickMeButton';
