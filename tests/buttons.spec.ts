@@ -1,5 +1,4 @@
-import { test } from '../src/fixtures/fixtures';
-import { expect } from '@playwright/test';
+import { test, expect } from '../src/fixtures/fixtures';
 
 //AAA
 test('Buttons aaa-pattern', { tag: ['@e2e', '@aaa-pattern', '@buttons'] }, async ({ buttonsPage }) => {
@@ -10,14 +9,14 @@ test('Buttons aaa-pattern', { tag: ['@e2e', '@aaa-pattern', '@buttons'] }, async
     rightClick: 'Right clicked: 1 times',
   };
 
-  await test.step('Click buttons', async ({}) => {
+  await test.step('Click buttons', async () => {
     //act
     await buttonsPage.clickMeButton.click();
     await buttonsPage.doubleClickMeButton.dblclick();
     await buttonsPage.rightClickMeButton.click({ button: 'right' });
   });
 
-  await test.step('Expect message with click count', async ({}) => {
+  await test.step('Expect message with click count', async () => {
     //assert
     await expect.soft(buttonsPage.clickMeMessage).toHaveText(messages.click);
     await expect.soft(buttonsPage.doubleClickMeMessage).toHaveText(messages.doubleClick);

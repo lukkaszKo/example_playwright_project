@@ -9,9 +9,9 @@
 ├── .vscode/                           # VS Code settings and recommended extensions
 ├── src/
 │   ├── fixtures/fixtures.ts           # custom Playwright fixtures
-│   └── pages/home.page.ts             # page objects
+│   └── pages/{home,buttons}.page.ts   # page objects
 ├── tests/
-│   └── example.spec.ts                # test specs
+│   └── buttons.spec.ts                # test specs
 ├── .env.example                       # example environment variables (BASE_URL)
 ├── .nvmrc                             # Node version
 ├── eslint.config.mjs                  # ESLint config
@@ -27,7 +27,7 @@
 | ------------------------ | --------------------------------------- |
 | `npm ci`                 | Install dependencies                    |
 | `npx playwright install` | Install Playwright browsers             |
-| `cp .env.example .env`   | Create local env file (sets `BASE_URL`) |
+| `cp .env.example .env`   | Create local env file (Windows: `copy`) |
 | `npm test`               | Run all tests                           |
 | `npm run test:ui`        | Run tests in UI mode                    |
 | `npm run test:headed`    | Run tests in headed mode                |

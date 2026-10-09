@@ -17,6 +17,9 @@ export const test = base.extend<TestFixtures>({
   buttonsPage: async ({ page, homePage }, use) => {
     const buttonsPage = new ButtonsPage(page);
     await homePage.buttonsLink.click();
+    await expect(buttonsPage.clickMeButton).toBeVisible();
     await use(buttonsPage);
   },
 });
+
+export { expect };
