@@ -13,7 +13,7 @@ test('Buttons aaa-pattern', { tag: ['@e2e', '@aaa-pattern', '@buttons'] }, async
   await test.step('Click buttons', async ({}) => {
     //act
     await buttonsPage.clickMeButton.click();
-    await buttonsPage.doubleClickMeButton.click({ clickCount: 2 });
+    await buttonsPage.doubleClickMeButton.dblclick();
     await buttonsPage.rightClickMeButton.click({ button: 'right' });
   });
 
