@@ -1,41 +1,19 @@
 {
   "compilerOptions": {
-    // --- Język i środowisko ---
-    // Wersja JavaScriptu, jaką TS zakłada w kodzie (Node 24 obsługuje ES2022 natywnie)
     "target": "es2022",
-    // Biblioteki typów: standard ES2022 + DOM (potrzebne w page.evaluate())
     "lib": ["ES2022", "DOM"],
-    // Ładuj tylko typy Node.js (process, fs, path...) zamiast wszystkich @types/*
     "types": ["node"],
-
-    // --- Moduły ---
-    // Format modułów ESM (import/export), zgodny z "type": "module" w package.json
     "module": "esnext",
-    // Rozwiązywanie importów jak w bundlerach: bez wymogu rozszerzeń .js w importach
     "moduleResolution": "bundler",
-    // Pozwala pisać import fs from 'fs' dla modułów CommonJS
     "esModuleInterop": true,
-    // Pozwala importować pliki .json z typami (np. dane testowe)
     "resolveJsonModule": true,
-    // Każdy plik musi dać się skompilować osobno (tak działa transpilacja w Playwrightcie)
     "isolatedModules": true,
-
-    // --- Ścisłość typów ---
-    // Włącza komplet ścisłych sprawdzeń (null/undefined, niejawne any itd.)
     "strict": true,
-    // Błąd, gdy w switch brakuje break i wykonanie "przecieka" do kolejnego case
     "noFallthroughCasesInSwitch": true,
-
-    // --- Wynik i wydajność ---
-    // Tylko sprawdzanie typów, bez generowania plików .js (Playwright transpiluje sam)
     "noEmit": true,
-    // Pomija sprawdzanie plików .d.ts z node_modules (szybsze, mniej cudzych błędów)
     "skipLibCheck": true,
-    // Błąd przy imporcie z inną wielkością liter niż nazwa pliku (Windows vs Linux w CI)
     "forceConsistentCasingInFileNames": true
   },
-  // Pliki objęte sprawdzaniem typów
   "include": ["src/**/*", "tests/**/*", "playwright.config.ts"],
-  // Katalogi pomijane (zależności i artefakty generowane przez Playwrighta)
   "exclude": ["node_modules", "test-results", "playwright-report"]
 }
