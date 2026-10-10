@@ -1,72 +1,117 @@
 import { test, expect } from '../src/fixtures/fixtures';
 
-//AAA
-test('Buttons aaa-pattern', { tag: ['@e2e', '@aaa-pattern', '@buttons'] }, async ({ buttonsPage }) => {
-  //arrange
-  const messages = {
-    click: 'Clicked: 1 times',
-    doubleClick: 'Double clicked: 1 times',
-    rightClick: 'Right clicked: 1 times',
-  };
+// AAA pattern
+test.describe('Buttons page (AAA tests)', { tag: ['@e2e', '@buttons', '@aaa-pattern'] }, () => {
+  test.describe('Click me button', () => {
+    test('Should display click message with count 1 after single click', { tag: '@functional' }, async ({ buttonsPage }) => {
+      // arrange
+      const message = 'Clicked: 1 times';
 
-  await test.step('Click buttons', async () => {
-    //act
-    await buttonsPage.clickMeButton.click();
-    await buttonsPage.doubleClickMeButton.dblclick();
-    await buttonsPage.rightClickMeButton.click({ button: 'right' });
+      await test.step('Click button', async () => {
+        // act
+        await buttonsPage.clickMeButton.click();
+      });
+
+      await test.step('Expect message with click count', async () => {
+        // assert
+        await expect(buttonsPage.clickMeMessage).toHaveText(message);
+      });
+    });
+
+    test('Should change background color of click me button on hover', { tag: '@functional' }, async ({ buttonsPage }) => {
+      // arrange
+      const expectedColorHover = 'rgba(166, 85, 247, 0.9)';
+
+      await test.step('Hover over button', async () => {
+        // act
+        await buttonsPage.clickMeButton.hover();
+      });
+
+      await test.step('Expect hover background color', async () => {
+        // assert
+        await expect(buttonsPage.clickMeButton).toHaveCSS('background-color', expectedColorHover);
+      });
+    });
   });
 
-  await test.step('Expect message with click count', async () => {
-    //assert
-    await expect.soft(buttonsPage.clickMeMessage).toHaveText(messages.click);
-    await expect.soft(buttonsPage.doubleClickMeMessage).toHaveText(messages.doubleClick);
-    await expect.soft(buttonsPage.rightClickMeMessage).toHaveText(messages.rightClick);
+  test.describe('Double click me button', () => {
+    test('Should display double click message with count 1 after double click', { tag: '@functional' }, async ({ buttonsPage }) => {
+      // arrange
+      const message = 'Double clicked: 1 times';
+
+      await test.step('Double click button', async () => {
+        // act
+        await buttonsPage.doubleClickMeButton.dblclick();
+      });
+
+      await test.step('Expect message with click count', async () => {
+        // assert
+        await expect(buttonsPage.doubleClickMeMessage).toHaveText(message);
+      });
+    });
+  });
+
+  test.describe('Right click me button', () => {
+    test('Should display right click message with count 1 after right click', { tag: '@functional' }, async ({ buttonsPage }) => {
+      // arrange
+      const message = 'Right clicked: 1 times';
+
+      await test.step('Right click button', async () => {
+        // act
+        await buttonsPage.rightClickMeButton.click({ button: 'right' });
+      });
+
+      await test.step('Expect message with click count', async () => {
+        // assert
+        await expect(buttonsPage.rightClickMeMessage).toHaveText(message);
+      });
+    });
   });
 });
 
-//DDT
-const buttons: {
-  buttonName: string;
-  action: 'clickMeButton' | 'doubleClickMeButton' | 'rightClickMeButton';
-  clickCount: number;
-  mouseButton: 'left' | 'right';
-  expectAction: 'clickMeMessage' | 'doubleClickMeMessage' | 'rightClickMeMessage';
-  expectMessage: string;
-}[] = [
-  {
-    buttonName: 'One click button',
-    action: 'clickMeButton',
-    clickCount: 1,
-    mouseButton: 'left',
-    expectAction: 'clickMeMessage',
-    expectMessage: 'Clicked: 1 times',
-  },
-  {
-    buttonName: 'Double click button',
-    action: 'doubleClickMeButton',
-    clickCount: 2,
-    mouseButton: 'left',
-    expectAction: 'doubleClickMeMessage',
-    expectMessage: 'Double clicked: 1 times',
-  },
-  {
-    buttonName: 'Right click button',
-    action: 'rightClickMeButton',
-    clickCount: 1,
-    mouseButton: 'right',
-    expectAction: 'rightClickMeMessage',
-    expectMessage: 'Right clicked: 1 times',
-  },
-];
+// DDT pattern
 
-for (const { buttonName, action, clickCount, mouseButton, expectAction, expectMessage } of buttons) {
-  test(`For '${buttonName}' check is correct message '${expectMessage}'`, { tag: ['@e2e', '@ddt-pattern', '@buttons'] }, async ({ buttonsPage }) => {
-    await test.step(`${buttonName}`, async () => {
-      await buttonsPage[action].click({ clickCount: clickCount, button: mouseButton });
-    });
+test.describe('Buttons page (data driven tests)', { tag: ['@e2e', '@ddt-pattern', '@buttons', '@functional'] }, () => {
+  test.describe('Buttons click', () => {
+    type Case = {
+      name: string;
+      button: 'clickMeButton' | 'doubleClickMeButton' | 'rightClickMeButton';
+      message: 'clickMeMessage' | 'doubleClickMeMessage' | 'rightClickMeMessage';
+      text: string;
+      clickCount?: number;
+      mouseButton?: 'left' | 'right';
+    };
 
-    await test.step('Expect message with click count', async () => {
-      await expect.soft(buttonsPage[expectAction]).toHaveText(expectMessage);
-    });
+    const cases: Case[] = [
+      { name: 'One click', button: 'clickMeButton', message: 'clickMeMessage', text: 'Clicked: 1 times' },
+      { name: 'Double click', button: 'doubleClickMeButton', message: 'doubleClickMeMessage', text: 'Double clicked: 1 times', clickCount: 2 },
+      { name: 'Right click', button: 'rightClickMeButton', message: 'rightClickMeMessage', text: 'Right clicked: 1 times', mouseButton: 'right' },
+    ];
+    for (const { name, button, message, text, clickCount = 1, mouseButton = 'left' } of cases) {
+      test(`${name} shows '${text}'`, async ({ buttonsPage }) => {
+        await buttonsPage[button].click({ clickCount: clickCount, button: mouseButton });
+        await expect(buttonsPage[message]).toHaveText(text);
+      });
+    }
   });
-}
+
+  test.describe('Buttons CSS verification: background-color on hover', () => {
+    type Case = {
+      name: string;
+      button: 'clickMeButton' | 'doubleClickMeButton' | 'rightClickMeButton';
+      color?: string;
+    };
+
+    const cases: Case[] = [
+      { name: 'One click', button: 'clickMeButton' },
+      { name: 'Double click', button: 'doubleClickMeButton' },
+      { name: 'Right click', button: 'rightClickMeButton' },
+    ];
+    for (const { name, button, color = 'rgba(166, 85, 247, 0.9)' } of cases) {
+      test(`CSS: '${name}' button should have background-color '${color}' after hover`, async ({ buttonsPage }) => {
+        await buttonsPage[button].hover();
+        await expect(buttonsPage[button]).toHaveCSS('background-color', color);
+      });
+    }
+  });
+});
