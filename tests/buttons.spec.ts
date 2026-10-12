@@ -1,4 +1,4 @@
-import { test, expect } from '../src/fixtures/fixtures';
+import { test, expect } from '../src/e2e/fixtures/fixtures';
 
 // AAA pattern
 test.describe('Buttons page (AAA tests)', { tag: ['@e2e', '@buttons', '@aaa-pattern'] }, () => {
