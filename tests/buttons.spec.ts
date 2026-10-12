@@ -69,8 +69,32 @@ test.describe('Buttons page (AAA tests)', { tag: ['@e2e', '@buttons', '@aaa-patt
   });
 });
 
-// DDT pattern
+// Visual tests
+test.describe('Buttons page (visual tests)', { tag: ['@e2e', '@buttons', '@visual-test'] }, () => {
+  test('Should match baseline screenshot after clicking all buttons', async ({ buttonsPage }) => {
+    await test.step('Click all buttons', async () => {
+      // act
+      await buttonsPage.clickMeButton.click();
+      await buttonsPage.doubleClickMeButton.dblclick();
+      await buttonsPage.rightClickMeButton.click({ button: 'right' });
+      await buttonsPage.clickMeButton.hover();
+    });
 
+    await test.step('Move mouse away to remove hover state', async () => {
+      await buttonsPage.moveMouseAway();
+    });
+
+    await test.step('Expect page to match baseline screenshot', async () => {
+      // assert
+      await expect(buttonsPage.mainContainer).toHaveScreenshot('buttons-page.png', {
+        animations: 'disabled',
+        threshold: 0.1,
+      });
+    });
+  });
+});
+
+// DDT pattern
 test.describe('Buttons page (data driven tests)', { tag: ['@e2e', '@ddt-pattern', '@buttons', '@functional'] }, () => {
   test.describe('Buttons click', () => {
     type Case = {

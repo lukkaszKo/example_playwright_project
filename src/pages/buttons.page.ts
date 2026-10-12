@@ -9,6 +9,7 @@ export class ButtonsPage {
   readonly doubleClickMeMessage: Locator;
   readonly rightClickMeButton: Locator;
   readonly rightClickMeMessage: Locator;
+  readonly mainContainer: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -18,5 +19,10 @@ export class ButtonsPage {
     this.doubleClickMeMessage = this.page.getByTestId('double-click-count');
     this.rightClickMeButton = this.page.getByRole('button', { name: 'Right click me' });
     this.rightClickMeMessage = this.page.getByTestId('right-click-count');
+    this.mainContainer = this.page.getByTestId('app-main-content');
+  }
+
+  async moveMouseAway() {
+    await this.page.mouse.move(0, 0);
   }
 }
