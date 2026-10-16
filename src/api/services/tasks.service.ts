@@ -1,48 +1,71 @@
-import { APIRequestContext, APIResponse } from '@playwright/test';
+import { APIRequestContext } from '@playwright/test';
 import { BaseClient } from '../client/base.client';
 import { AuthClient } from '../client/auth.client';
 import { CreateTaskData, DeleteMessage, Task, TasksListResponse, UpdateTaskData, UpdateTaskStatus } from '../models/tasks.model';
+import { getResponseBodyJson } from '../helpers/response.helper';
 
 export class TaskService extends BaseClient {
   constructor(request: APIRequestContext, authClient: AuthClient) {
     super(request, authClient);
   }
 
-  private async checkResponse<T>(response: APIResponse) {
-    if (!response.ok()) {
-      throw new Error(`EP: ${response.url()}, Status: ${response.status()}, Error: ${await response.text()}`);
-    }
-    const responseBody: T = await response.json();
-    return responseBody;
+  async getTasksListRaw() {
+    const response = await this.authGet('/api/tasks');
+    return response;
   }
 
   async getTasksList() {
-    const response = await this.authGet('/api/tasks');
-    return this.checkResponse<TasksListResponse>(response);
+    const response = await this.getTasksListRaw();
+    return getResponseBodyJson<TasksListResponse>(response);
+  }
+
+  async createTaskRaw(data: Partial<CreateTaskData>) {
+    const response = await this.authPost('/api/tasks', { data });
+    return response;
   }
 
   async createTask(data: CreateTaskData) {
-    const response = await this.authPost('/api/tasks', { data });
-    return this.checkResponse<Task>(response);
+    const response = await this.createTaskRaw(data);
+    return getResponseBodyJson<Task>(response);
+  }
+
+  async getTaskInfoRaw(id: string) {
+    const response = await this.authGet(`/api/tasks/${id}`);
+    return response;
   }
 
   async getTaskInfo(id: string) {
-    const response = await this.authGet(`/api/tasks/${id}`);
-    return this.checkResponse<Task>(response);
+    const response = await this.getTaskInfoRaw(id);
+    return getResponseBodyJson<Task>(response);
+  }
+
+  async updateTaskRaw(id: string, data: UpdateTaskData) {
+    const response = await this.authPut(`/api/tasks/${id}`, { data });
+    return response;
   }
 
   async updateTask(id: string, data: UpdateTaskData) {
-    const response = await this.authPut(`/api/tasks/${id}`, { data });
-    return this.checkResponse<Task>(response);
+    const response = await this.updateTaskRaw(id, data);
+    return getResponseBodyJson<Task>(response);
+  }
+
+  async deleteTaskRaw(id: string) {
+    const response = await this.authDelete(`/api/tasks/${id}`);
+    return response;
   }
 
   async deleteTask(id: string) {
-    const response = await this.authDelete(`/api/tasks/${id}`);
-    return this.checkResponse<DeleteMessage>(response);
+    const response = await this.deleteTaskRaw(id);
+    return getResponseBodyJson<DeleteMessage>(response);
   }
 
-  async updateStatusTask(id: string, data: UpdateTaskStatus) {
+  async updateTaskStatusRaw(id: string, data: Partial<UpdateTaskStatus>) {
     const response = await this.authPatch(`/api/tasks/${id}/status`, { data });
-    return this.checkResponse<Task>(response);
+    return response;
+  }
+
+  async updateTaskStatus(id: string, data: UpdateTaskStatus) {
+    const response = await this.updateTaskStatusRaw(id, data);
+    return getResponseBodyJson<Task>(response);
   }
 }
