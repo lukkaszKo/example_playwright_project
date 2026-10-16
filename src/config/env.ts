@@ -14,4 +14,8 @@ export const env = {
     email: requireEnv('EMAIL_USER_ONE'),
     password: requireEnv('PASSWORD_USER_ONE'),
   },
+  userTwo: {
+    email: requireEnv('EMAIL_USER_TWO'),
+    password: requireEnv('PASSWORD_USER_TWO'),
+  },
 };
