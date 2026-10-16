@@ -25,10 +25,10 @@ jobs:
         run: npx playwright test
         env:
           BASE_URL: ${{ vars.BASE_URL }}
-          EMAIL_USER_ONE: ${{ secrets.EMAIL_USER_ONE }}
-          PASSWORD_USER_ONE: ${{ secrets.PASSWORD_USER_ONE }}
-          EMAIL_USER_TWO: ${{ secrets.EMAIL_USER_TWO }}
-          PASSWORD_USER_TWO: ${{ secrets.PASSWORD_USER_TWO }}
+          EMAIL_USER_ONE: ${{ vars.EMAIL_USER_ONE }}
+          PASSWORD_USER_ONE: ${{ vars.PASSWORD_USER_ONE }}
+          EMAIL_USER_TWO: ${{ vars.EMAIL_USER_TWO }}
+          PASSWORD_USER_TWO: ${{ vars.PASSWORD_USER_TWO }}
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
