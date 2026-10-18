@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
 import { test } from '../../src/api/fixtures/fixtures';
-import { CreateTaskData, Priority, Status, UpdateTaskStatus } from '../../src/api/models/tasks.model';
+import { CreateTaskData, Priority, Status, Task, UpdateTaskStatus } from '../../src/api/models/tasks.model';
 
 test.describe('Tasks API', { tag: ['@api', '@task'] }, () => {
   test.describe.configure({ mode: 'default' });
@@ -403,6 +403,55 @@ test.describe('Tasks API', { tag: ['@api', '@task'] }, () => {
 
       // Assert
       expect(response.status()).toBe(404);
+    });
+  });
+
+  test.describe('Tasks access control', { tag: ['@integration', '@security'] }, () => {
+    let userOneTask: Task;
+
+    test.beforeEach(async ({ tasksServiceUserOne }) => {
+      const taskData: CreateTaskData = {
+        title: `Task ${Date.now()}`,
+        priority: 'medium',
+        status: 'backlog',
+        description: 'Security test',
+      };
+      userOneTask = await tasksServiceUserOne.createTask(taskData);
+    });
+
+    test('returns 404 when another user gets the task', async ({ tasksServiceUserTwo }) => {
+      // Act
+      const response = await tasksServiceUserTwo.getTaskInfoRaw(userOneTask.id);
+
+      // Assert
+      expect(response.status()).toBe(404);
+    });
+
+    test('returns 404 when another user updates the task', async ({ tasksServiceUserOne, tasksServiceUserTwo }) => {
+      // Act
+      const response = await tasksServiceUserTwo.updateTaskRaw(userOneTask.id, { priority: 'high' });
+
+      // Assert
+      expect(response.status()).toBe(404);
+      expect(await tasksServiceUserOne.getTaskInfo(userOneTask.id)).toEqual(userOneTask);
+    });
+
+    test('returns 404 when another user updates the task status', async ({ tasksServiceUserOne, tasksServiceUserTwo }) => {
+      // Act
+      const response = await tasksServiceUserTwo.updateTaskStatusRaw(userOneTask.id, { status: 'done' });
+
+      // Assert
+      expect(response.status()).toBe(404);
+      expect(await tasksServiceUserOne.getTaskInfo(userOneTask.id)).toEqual(userOneTask);
+    });
+
+    test('returns 404 when another user deletes the task', async ({ tasksServiceUserOne, tasksServiceUserTwo }) => {
+      // Act
+      const response = await tasksServiceUserTwo.deleteTaskRaw(userOneTask.id);
+
+      // Assert
+      expect(response.status()).toBe(404);
+      expect(await tasksServiceUserOne.getTaskInfo(userOneTask.id)).toEqual(userOneTask);
     });
   });
 });
