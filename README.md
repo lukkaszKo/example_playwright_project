@@ -12,6 +12,7 @@
 │   │   ├── client/
 │   │   │   ├── auth.client.ts         # register / login, stores the access token
 │   │   │   └── base.client.ts         # base class: authGet/Post/Put/Patch/Delete with Bearer token
+│   │   ├── factories/task.factory.ts  # buildTaskData(overrides) - test data builder (faker)
 │   │   ├── fixtures/fixtures.ts       # API fixtures (authClientUserOne, tasksServiceUserOne)
 │   │   ├── helpers/response.helper.ts # getResponse / getResponseBodyJson (status check + typed body)
 │   │   ├── models/                    # TypeScript types of API requests/responses
@@ -62,14 +63,15 @@
 
 API tests use Playwright's `request` context and are organised in layers:
 
-| Layer    | Location            | Responsibility                                                                 |
-| -------- | ------------------- | ------------------------------------------------------------------------------ |
-| Config   | `src/config/env.ts` | Reads env variables and throws if any is missing                               |
-| Models   | `src/api/models/`   | Types for request/response bodies (e.g. `LoginResponse`, `TasksListResponse`)  |
-| Helpers  | `src/api/helpers/`  | `getResponse` / `getResponseBodyJson<T>` - throw a readable error on non-2xx   |
-| Clients  | `src/api/client/`   | `AuthClient` (register, login, token) and `BaseClient` (authorized HTTP calls) |
-| Services | `src/api/services/` | Domain endpoints built on `BaseClient`, e.g. `TaskService.getTasksList()`      |
-| Fixtures | `src/api/fixtures/` | Ready-to-use, already authenticated objects injected into tests                |
+| Layer     | Location             | Responsibility                                                                          |
+| --------- | -------------------- | --------------------------------------------------------------------------------------- |
+| Config    | `src/config/env.ts`  | Reads env variables and throws if any is missing                                        |
+| Models    | `src/api/models/`    | Types for request/response bodies (e.g. `LoginResponse`, `TasksListResponse`)           |
+| Factories | `src/api/factories/` | `buildTaskData(overrides)` - random valid data, override only what the test cares about |
+| Helpers   | `src/api/helpers/`   | `getResponse` / `getResponseBodyJson<T>` - throw a readable error on non-2xx            |
+| Clients   | `src/api/client/`    | `AuthClient` (register, login, token) and `BaseClient` (authorized HTTP calls)          |
+| Services  | `src/api/services/`  | Domain endpoints built on `BaseClient`, e.g. `TaskService.getTasksList()`               |
+| Fixtures  | `src/api/fixtures/`  | Ready-to-use, already authenticated objects injected into tests                         |
 
 ### Raw vs. parsed methods
 
@@ -94,7 +96,7 @@ Copy `.env.example` to `.env` and fill in:
 
 1. The fixture `authClientUserOne` logs in via `POST /api/auth/login` and stores the `access_token`.
 2. `tasksServiceUserOne` receives that client; `BaseClient` adds the `Authorization: Bearer <token>` header to every call.
-3. The test just uses the service.
+3. The test just uses the service. Every task created through `TaskService` is tracked and deleted by the fixture after the test, so tests are isolated and can run in parallel.
 
 ### Test tags
 

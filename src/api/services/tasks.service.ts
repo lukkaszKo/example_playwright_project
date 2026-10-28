@@ -5,6 +5,7 @@ import { CreateTaskData, DeleteMessage, Task, TasksListResponse, UpdateTaskData,
 import { getResponseBodyJson } from '../helpers/response.helper';
 
 export class TaskService extends BaseClient {
+  private readonly createdTaskIds: string[] = [];
   constructor(request: APIRequestContext, authClient: AuthClient) {
     super(request, authClient);
   }
@@ -21,6 +22,9 @@ export class TaskService extends BaseClient {
 
   async createTaskRaw(data: Partial<CreateTaskData>) {
     const response = await this.authPost('/api/tasks', { data });
+    if (response.ok()) {
+      this.createdTaskIds.push((await response.json()).id);
+    }
     return response;
   }
 
@@ -67,5 +71,11 @@ export class TaskService extends BaseClient {
   async updateTaskStatus(id: string, data: UpdateTaskStatus) {
     const response = await this.updateTaskStatusRaw(id, data);
     return getResponseBodyJson<Task>(response);
+  }
+
+  async deleteCreatedTasks() {
+    for (const id of this.createdTaskIds.splice(0)) {
+      await this.deleteTaskRaw(id);
+    }
   }
 }

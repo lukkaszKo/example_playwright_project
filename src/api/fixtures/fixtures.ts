@@ -26,9 +26,11 @@ export const test = base.extend<ApiTestFixtures>({
   tasksServiceUserOne: async ({ request, authClientUserOne }, use) => {
     const tasksService = new TaskService(request, authClientUserOne);
     await use(tasksService);
+    await tasksService.deleteCreatedTasks();
   },
   tasksServiceUserTwo: async ({ request, authClientUserTwo }, use) => {
     const tasksService = new TaskService(request, authClientUserTwo);
     await use(tasksService);
+    await tasksService.deleteCreatedTasks();
   },
 });

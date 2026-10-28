@@ -1,28 +1,13 @@
 import { expect } from '@playwright/test';
 import { test } from '../../src/api/fixtures/fixtures';
+import { buildTaskData } from '../../src/api/factories/task.factory';
 import { CreateTaskData, Priority, Status, Task, UpdateTaskStatus } from '../../src/api/models/tasks.model';
 
 test.describe('Tasks API', { tag: ['@api', '@task'] }, () => {
-  test.describe.configure({ mode: 'default' });
-
-  test.beforeAll('clear tasks list before tests', async ({ tasksServiceUserOne }) => {
-    const taskList = await tasksServiceUserOne.getTasksList();
-    for (const task of taskList.tasks) {
-      await tasksServiceUserOne.deleteTask(task.id);
-    }
-    const emptyList = await tasksServiceUserOne.getTasksList();
-    expect(emptyList.tasks).toHaveLength(0);
-  });
-
   test.describe('createTask', () => {
     test('creates a task with all fields', { tag: '@functional' }, async ({ tasksServiceUserOne }) => {
       // Arrange
-      const taskData: CreateTaskData = {
-        title: `Task ${Date.now()}`,
-        priority: 'medium',
-        status: 'backlog',
-        description: 'Test description',
-      };
+      const taskData = buildTaskData({ description: 'Test description' });
 
       // Act
       const task = await tasksServiceUserOne.createTask(taskData);
@@ -38,11 +23,7 @@ test.describe('Tasks API', { tag: ['@api', '@task'] }, () => {
 
     test('creates a task without description', { tag: '@functional' }, async ({ tasksServiceUserOne }) => {
       // Arrange
-      const taskData: CreateTaskData = {
-        title: `Task ${Date.now()}`,
-        priority: 'low',
-        status: 'backlog',
-      };
+      const taskData = buildTaskData({ priority: 'low' });
 
       // Act
       const task = await tasksServiceUserOne.createTask(taskData);
@@ -69,9 +50,8 @@ test.describe('Tasks API', { tag: ['@api', '@task'] }, () => {
     test('rejects a task with invalid priority', { tag: '@functional' }, async ({ tasksServiceUserOne }) => {
       // Arrange
       const taskData: Partial<CreateTaskData> = {
-        title: `Task ${Date.now()}`,
+        ...buildTaskData(),
         priority: 'medium2' as unknown as Priority,
-        status: 'backlog',
       };
 
       // Act
@@ -84,8 +64,7 @@ test.describe('Tasks API', { tag: ['@api', '@task'] }, () => {
     test('rejects a task with invalid status', { tag: '@functional' }, async ({ tasksServiceUserOne }) => {
       // Arrange
       const taskData: Partial<CreateTaskData> = {
-        title: `Task ${Date.now()}`,
-        priority: 'medium',
+        ...buildTaskData(),
         status: 'backlog2' as unknown as Status,
       };
 
@@ -100,12 +79,7 @@ test.describe('Tasks API', { tag: ['@api', '@task'] }, () => {
   test.describe('getTasksList', () => {
     test('returns list with the created task and consistent meta', { tag: '@integration' }, async ({ tasksServiceUserOne }) => {
       // Arrange
-      const taskData: CreateTaskData = {
-        title: `Task ${Date.now()}`,
-        priority: 'medium',
-        status: 'backlog',
-        description: 'Test description',
-      };
+      const taskData = buildTaskData({ description: 'Test description' });
       const task = await tasksServiceUserOne.createTask(taskData);
 
       // Act
@@ -119,11 +93,7 @@ test.describe('Tasks API', { tag: ['@api', '@task'] }, () => {
 
     test('returns tasks with all required fields', { tag: '@functional' }, async ({ tasksServiceUserOne }) => {
       // Arrange
-      const taskData: CreateTaskData = {
-        title: `Task ${Date.now()}`,
-        priority: 'medium',
-        status: 'backlog',
-      };
+      const taskData = buildTaskData();
       await tasksServiceUserOne.createTask(taskData);
 
       // Act
@@ -145,12 +115,7 @@ test.describe('Tasks API', { tag: ['@api', '@task'] }, () => {
   test.describe('getTaskInfo', () => {
     test('returns the task by id', { tag: '@integration' }, async ({ tasksServiceUserOne }) => {
       // Arrange
-      const taskData: CreateTaskData = {
-        title: `Task ${Date.now()}`,
-        priority: 'high',
-        status: 'backlog',
-        description: 'Test description',
-      };
+      const taskData = buildTaskData({ priority: 'high', description: 'Test description' });
       const task = await tasksServiceUserOne.createTask(taskData);
 
       // Act
@@ -175,12 +140,7 @@ test.describe('Tasks API', { tag: ['@api', '@task'] }, () => {
   test.describe('updateTask', () => {
     test('updates title and priority, keeps other fields', { tag: '@functional' }, async ({ tasksServiceUserOne }) => {
       // Arrange
-      const taskData: CreateTaskData = {
-        title: `Task ${Date.now()}`,
-        priority: 'low',
-        status: 'backlog',
-        description: 'Test description',
-      };
+      const taskData = buildTaskData({ priority: 'low', description: 'Test description' });
       const task = await tasksServiceUserOne.createTask(taskData);
       const updateData = { title: `${task.title} updated`, priority: 'high' as Priority };
 
@@ -210,12 +170,7 @@ test.describe('Tasks API', { tag: ['@api', '@task'] }, () => {
 
     test('updates status and description', { tag: '@functional' }, async ({ tasksServiceUserOne }) => {
       // Arrange
-      const taskData: CreateTaskData = {
-        title: `Task ${Date.now()}`,
-        priority: 'medium',
-        status: 'backlog',
-        description: 'Test description',
-      };
+      const taskData = buildTaskData({ description: 'Test description' });
       const task = await tasksServiceUserOne.createTask(taskData);
       const updateData = { status: 'done' as Status, description: 'Updated description' };
 
@@ -228,11 +183,7 @@ test.describe('Tasks API', { tag: ['@api', '@task'] }, () => {
 
     test('rejects invalid priority', { tag: '@functional' }, async ({ tasksServiceUserOne }) => {
       // Arrange
-      const task = await tasksServiceUserOne.createTask({
-        title: `Task ${Date.now()}`,
-        priority: 'medium',
-        status: 'backlog',
-      });
+      const task = await tasksServiceUserOne.createTask(buildTaskData());
       const updateData: Partial<CreateTaskData> = { priority: 'medium2' as unknown as Priority };
 
       // Act
@@ -244,11 +195,7 @@ test.describe('Tasks API', { tag: ['@api', '@task'] }, () => {
 
     test('rejects invalid status', { tag: '@functional' }, async ({ tasksServiceUserOne }) => {
       // Arrange
-      const task = await tasksServiceUserOne.createTask({
-        title: `Task ${Date.now()}`,
-        priority: 'medium',
-        status: 'backlog',
-      });
+      const task = await tasksServiceUserOne.createTask(buildTaskData());
       const updateData: Partial<CreateTaskData> = { status: 'archived' as unknown as Status };
 
       // Act
@@ -260,11 +207,7 @@ test.describe('Tasks API', { tag: ['@api', '@task'] }, () => {
 
     test('rejects empty title', { tag: '@functional' }, async ({ tasksServiceUserOne }) => {
       // Arrange
-      const task = await tasksServiceUserOne.createTask({
-        title: `Task ${Date.now()}`,
-        priority: 'medium',
-        status: 'backlog',
-      });
+      const task = await tasksServiceUserOne.createTask(buildTaskData());
       const updateData: Partial<CreateTaskData> = { title: '' };
 
       // Act
@@ -278,11 +221,7 @@ test.describe('Tasks API', { tag: ['@api', '@task'] }, () => {
   test.describe('updateTaskStatus', () => {
     test('updates status and position', { tag: '@functional' }, async ({ tasksServiceUserOne }) => {
       // Arrange
-      const taskData: CreateTaskData = {
-        title: `Task ${Date.now()}`,
-        priority: 'medium',
-        status: 'backlog',
-      };
+      const taskData = buildTaskData();
       const task = await tasksServiceUserOne.createTask(taskData);
       const statusData = { status: 'in_progress' as Status, position: 2 };
 
@@ -297,11 +236,7 @@ test.describe('Tasks API', { tag: ['@api', '@task'] }, () => {
 
     test('updates status without position', { tag: '@functional' }, async ({ tasksServiceUserOne }) => {
       // Arrange
-      const taskData: CreateTaskData = {
-        title: `Task ${Date.now()}`,
-        priority: 'medium',
-        status: 'backlog',
-      };
+      const taskData = buildTaskData();
       const task = await tasksServiceUserOne.createTask(taskData);
       const statusData = { status: 'done' as Status };
 
@@ -314,11 +249,7 @@ test.describe('Tasks API', { tag: ['@api', '@task'] }, () => {
 
     test('rejects invalid status', { tag: '@functional' }, async ({ tasksServiceUserOne }) => {
       // Arrange
-      const taskData: CreateTaskData = {
-        title: `Task ${Date.now()}`,
-        priority: 'medium',
-        status: 'backlog',
-      };
+      const taskData = buildTaskData();
       const task = await tasksServiceUserOne.createTask(taskData);
       const statusData: Partial<UpdateTaskStatus> = { status: 'archived' as unknown as Status };
 
@@ -331,11 +262,7 @@ test.describe('Tasks API', { tag: ['@api', '@task'] }, () => {
 
     test('rejects missing status', { tag: '@functional' }, async ({ tasksServiceUserOne }) => {
       // Arrange
-      const taskData: CreateTaskData = {
-        title: `Task ${Date.now()}`,
-        priority: 'medium',
-        status: 'backlog',
-      };
+      const taskData = buildTaskData();
       const task = await tasksServiceUserOne.createTask(taskData);
       const statusData: Partial<UpdateTaskStatus> = { position: 1 };
 
@@ -362,11 +289,7 @@ test.describe('Tasks API', { tag: ['@api', '@task'] }, () => {
   test.describe('deleteTask', () => {
     test('deletes the task', { tag: '@integration' }, async ({ tasksServiceUserOne }) => {
       // Arrange
-      const taskData: CreateTaskData = {
-        title: `Task ${Date.now()}`,
-        priority: 'medium',
-        status: 'backlog',
-      };
+      const taskData = buildTaskData();
       const task = await tasksServiceUserOne.createTask(taskData);
 
       // Act
@@ -379,11 +302,7 @@ test.describe('Tasks API', { tag: ['@api', '@task'] }, () => {
 
     test('returns 404 when deleting the same task twice', { tag: '@integration' }, async ({ tasksServiceUserOne }) => {
       // Arrange
-      const taskData: CreateTaskData = {
-        title: `Task ${Date.now()}`,
-        priority: 'medium',
-        status: 'backlog',
-      };
+      const taskData = buildTaskData();
       const task = await tasksServiceUserOne.createTask(taskData);
       await tasksServiceUserOne.deleteTask(task.id);
 
@@ -410,12 +329,7 @@ test.describe('Tasks API', { tag: ['@api', '@task'] }, () => {
     let userOneTask: Task;
 
     test.beforeEach(async ({ tasksServiceUserOne }) => {
-      const taskData: CreateTaskData = {
-        title: `Task ${Date.now()}`,
-        priority: 'medium',
-        status: 'backlog',
-        description: 'Security test',
-      };
+      const taskData = buildTaskData({ description: 'Security test' });
       userOneTask = await tasksServiceUserOne.createTask(taskData);
     });
 
